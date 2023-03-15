@@ -94,7 +94,8 @@ function App() {
           <Form.Control
             aria-label="Example text with button addon"
             aria-describedby="basic-addon1"
-            value={country.value !== 0 ? 0 : country.value}
+            placeholder="0"
+            className="text-dark fs-3 text-center fw-bold"
             onChange={(e)=>{
               setCountry((prevValue)=>{
                 return{
@@ -122,6 +123,8 @@ function App() {
           <Form.Control
             aria-label="Example text with button addon"
             aria-describedby="basic-addon1"
+            className="text-dark fs-3 text-center fw-bold"
+            placeholder="0"
             value={currencyVal}
             onChange={(e)=>{
               setCountryTwo((prevValue)=>{
