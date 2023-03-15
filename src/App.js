@@ -1,17 +1,60 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Dropdown from "react-bootstrap/Dropdown";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import countries from "country-data";
+import CurrencyAPI from '@everapi/currencyapi-js';
+
+
 
 function App() {
-  const [country, setCountry] = useState("");
-  const [countryTwo, setCountryTwo] = useState("")
+
+  const [currencyVal , setCurrencyVal] = useState("")
+
+  const [country, setCountry] = useState({
+    name: "",
+    currency: "",
+    value : 1,
+  });
+  const [countryTwo, setCountryTwo] = useState({
+    name: "",
+    currency: "",
+    value : 1,
+  });
+
+
+  function apiCall(base, currency){
+    const currencyApi = new CurrencyAPI(process.env.REACT_APP_CURRENCY_API);
+    currencyApi.latest({
+        base_currency: base,
+        currencies: currency
+    }).then(response => {
+      setCurrencyVal(response.data[currency].value);
+    });
+    
+  }
+
+  
+  useEffect(() => {
+    function fetchVal(){
+      if(country.currency !== "" && countryTwo.currency !== ""){
+        apiCall(country.currency, countryTwo.currency);
+      }
+    }
+    fetchVal();
+  })
+
+  
 
   const countryList = countries.countries.all.map((country, index) => (
     <Dropdown.Item key={index}  onClick={()=>{
-      setCountry(country.name);
+      setCountry(()=>{
+        return{
+          name: country.name,
+          currency: country.currencies[0],
+        }
+      });
     }}>
       {country.emoji} {country.name}
     </Dropdown.Item>
@@ -19,11 +62,17 @@ function App() {
 
   const countryList2 = countries.countries.all.map((country, index) => (
     <Dropdown.Item key={index} onClick={() => {
-      setCountryTwo(country.name);
+      setCountryTwo(()=>{
+        return{
+          name: country.name,
+          currency: country.currencies[0],
+        }
+      });
     }}>
       {country.emoji} {country.name}
     </Dropdown.Item>
   ));
+
 
 
   return (
@@ -36,7 +85,7 @@ function App() {
               variant="dark"
               className="w-50"
             >
-              {country === "" ? "Country" : country}
+              {country.name === "" ? "Country" : country.name}
             </Dropdown.Toggle>
             <Dropdown.Menu variant="dark" className=" w-50 dropdown-menu">
               {countryList}
@@ -45,6 +94,16 @@ function App() {
           <Form.Control
             aria-label="Example text with button addon"
             aria-describedby="basic-addon1"
+            value={country.value !== 0 ? 0 : country.value}
+            onChange={(e)=>{
+              setCountry((prevValue)=>{
+                return{
+                  name: prevValue.name,
+                  currency: prevValue.currency,
+                  value: e.target.value,
+                }
+              })
+            }}
           />
         </InputGroup>
         <InputGroup className="my-3">
@@ -54,7 +113,7 @@ function App() {
               variant="dark"
               className="w-50"
             >
-            {countryTwo === "" ? "Country" : countryTwo}
+            {countryTwo.name === "" ? "Country" : countryTwo.name}
             </Dropdown.Toggle>
             <Dropdown.Menu variant="dark" className=" w-50 dropdown-menu">
               {countryList2}
@@ -63,6 +122,16 @@ function App() {
           <Form.Control
             aria-label="Example text with button addon"
             aria-describedby="basic-addon1"
+            value={currencyVal}
+            onChange={(e)=>{
+              setCountryTwo((prevValue)=>{
+                return{
+                  name: prevValue.name,
+                  currency: prevValue.currency,
+                  value: e.target.value,
+                }
+              })
+            }}
           />
         </InputGroup>
       </div>
