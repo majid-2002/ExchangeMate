@@ -9,18 +9,16 @@ import CurrencyAPI from '@everapi/currencyapi-js';
 
 
 function App() {
-
-  const [currencyVal , setCurrencyVal] = useState("")
-
+  const [currencyValue, setCurrencyValue] = useState(0);
   const [country, setCountry] = useState({
     name: "",
     currency: "",
-    value : 1,
+    value : 0,
   });
   const [countryTwo, setCountryTwo] = useState({
     name: "",
     currency: "",
-    value : 1,
+    value : 0,
   });
 
 
@@ -30,20 +28,17 @@ function App() {
         base_currency: base,
         currencies: currency
     }).then(response => {
-      setCurrencyVal(response.data[currency].value);
+      setCurrencyValue(response.data[currency].value);
     });
     
   }
 
   
   useEffect(() => {
-    function fetchVal(){
-      if(country.currency !== "" && countryTwo.currency !== ""){
+      if(country.currency !== "" && countryTwo.currency !== "" && (country.value || countryTwo.value)){
         apiCall(country.currency, countryTwo.currency);
       }
-    }
-    fetchVal();
-  })
+  }, [country, countryTwo])
 
   
 
@@ -56,7 +51,7 @@ function App() {
         }
       });
     }}>
-      {country.emoji} {country.name}
+      {country.emoji} {country.name} ({country.currencies[0]})
     </Dropdown.Item>
   ));
 
@@ -69,11 +64,11 @@ function App() {
         }
       });
     }}>
-      {country.emoji} {country.name}
+      {country.emoji} {country.name} ({country.currencies[0]})
     </Dropdown.Item>
   ));
 
-
+    const [selectedCountry, setSelectedCountry] = useState(0);
 
   return (
     <div className="input-area">
@@ -85,7 +80,7 @@ function App() {
               variant="dark"
               className="w-50"
             >
-              {country.name === "" ? "Country" : country.name}
+              {country.currency === "" ? "Country" : country.name + " (" + country.currency + ")"}
             </Dropdown.Toggle>
             <Dropdown.Menu variant="dark" className=" w-50 dropdown-menu">
               {countryList}
@@ -96,6 +91,10 @@ function App() {
             aria-describedby="basic-addon1"
             placeholder="0"
             className="text-dark fs-3 text-center fw-bold"
+            value={country.value}
+            onFocus={(e)=>{
+              setSelectedCountry(0);
+            }}
             onChange={(e)=>{
               setCountry((prevValue)=>{
                 return{
@@ -114,7 +113,7 @@ function App() {
               variant="dark"
               className="w-50"
             >
-            {countryTwo.name === "" ? "Country" : countryTwo.name}
+              {countryTwo.currency === "" ? "Country" : countryTwo.name + " (" + countryTwo.currency + ")"}
             </Dropdown.Toggle>
             <Dropdown.Menu variant="dark" className=" w-50 dropdown-menu">
               {countryList2}
@@ -125,7 +124,7 @@ function App() {
             aria-describedby="basic-addon1"
             className="text-dark fs-3 text-center fw-bold"
             placeholder="0"
-            value={currencyVal}
+            value={currencyValue ? country.value * currencyValue : 0}
             onChange={(e)=>{
               setCountryTwo((prevValue)=>{
                 return{
@@ -134,6 +133,9 @@ function App() {
                   value: e.target.value,
                 }
               })
+            }}
+            onFocus={(e)=>{
+              setSelectedCountry(1);
             }}
           />
         </InputGroup>
