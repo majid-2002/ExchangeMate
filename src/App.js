@@ -68,7 +68,6 @@ function App() {
     </Dropdown.Item>
   ));
 
-    const [selectedCountry, setSelectedCountry] = useState(0);
 
   return (
     <div className="input-area">
@@ -92,9 +91,6 @@ function App() {
             placeholder="0"
             className="text-dark fs-3 text-center fw-bold"
             value={country.value}
-            onFocus={(e)=>{
-              setSelectedCountry(0);
-            }}
             onChange={(e)=>{
               setCountry((prevValue)=>{
                 return{
@@ -124,7 +120,7 @@ function App() {
             aria-describedby="basic-addon1"
             className="text-dark fs-3 text-center fw-bold"
             placeholder="0"
-            value={currencyValue ? country.value * currencyValue : 0}
+            value={currencyValue ? (country.value * currencyValue).toFixed(2) : 0}
             onChange={(e)=>{
               setCountryTwo((prevValue)=>{
                 return{
@@ -133,9 +129,6 @@ function App() {
                   value: e.target.value,
                 }
               })
-            }}
-            onFocus={(e)=>{
-              setSelectedCountry(1);
             }}
           />
         </InputGroup>
